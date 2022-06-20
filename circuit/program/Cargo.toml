@@ -41,7 +41,7 @@ version = "0.7.5"
 version = "7.1"
 
 [dev-dependencies.anyhow]
-version = "1.0.57"
+version = "1.0.58"
 
 [features]
 default = ["enable_console"]
