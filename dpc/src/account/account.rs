@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with the snarkVM library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::{Address, Network, PrivateKey, ViewKey};
+use crate::{AccountError, Address, Network, PrivateKey, ViewKey};
 
 use rand::{CryptoRng, Rng};
+use snarkvm_utilities::{ToBits, ToBytes};
 use std::fmt;
 
 #[derive(Clone)]
@@ -45,6 +46,11 @@ impl<N: Network> Account<N> {
     /// Returns a reference to the address.
     pub fn address(&self) -> Address<N> {
         self.address
+    }
+
+    /// Signs a message using the account private key.
+    pub fn sign<R: Rng + CryptoRng>(&self, message: &[u8], rng: &mut R) -> Result<Vec<u8>, AccountError> {
+        Ok(self.private_key.sign(&message.to_bits_le(), rng)?.to_bytes_le()?)
     }
 }
 

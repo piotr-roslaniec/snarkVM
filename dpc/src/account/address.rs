@@ -22,11 +22,9 @@ use snarkvm_utilities::{
     io::{Read, Result as IoResult, Write},
     ops::Deref,
     str::FromStr,
-    FromBytes,
-    FromBytesDeserializer,
-    ToBytes,
-    ToBytesSerializer,
+    FromBytesDeserializer, ToBytes, ToBytesSerializer,
 };
+use snarkvm_utilities::{FromBytes, ToBits};
 
 use bech32::{self, FromBase32, ToBase32};
 use core::hash::{Hash, Hasher};
@@ -56,6 +54,14 @@ impl<N: Network> Address<N> {
     /// Returns `true` if the signature is valid. Otherwise, returns `false`.
     pub fn verify_signature(&self, message: &[bool], signature: &N::AccountSignature) -> Result<bool, AccountError> {
         Ok(N::account_signature_scheme().verify(&self.0, message, signature)?)
+    }
+
+    /// Verifies signature bytes on a message signed by the account private key.
+    /// Returns `true` if the signature is valid. Otherwise, returns `false`.
+    pub fn verify_signature_bytes(&self, message: &[u8], signature: &[u8]) -> Result<bool, AccountError> {
+        let message = message.to_bits_le();
+        let signature = FromBytes::from_bytes_le(signature)?;
+        self.verify_signature(&message, &signature)
     }
 }
 

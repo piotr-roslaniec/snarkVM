@@ -56,3 +56,18 @@ fn test_account_sign() {
         assert!(result.unwrap(), "Signature is invalid");
     }
 }
+
+#[wasm_bindgen_test]
+fn test_account_sign_and_verify_bytes() {
+    let rng = &mut rand::thread_rng();
+    let account = Account::<Testnet2>::new(rng);
+
+    let message = "hello world!";
+    let result = account.sign(&message.as_bytes(), rng);
+    assert!(result.is_ok(), "Failed to generate a signature");
+
+    let signature = result.unwrap();
+    let result = account.address().verify_signature_bytes(message.as_bytes(), &signature);
+    assert!(result.is_ok(), "Failed to execute signature verification");
+    assert!(result.unwrap(), "Signature is invalid");
+}
